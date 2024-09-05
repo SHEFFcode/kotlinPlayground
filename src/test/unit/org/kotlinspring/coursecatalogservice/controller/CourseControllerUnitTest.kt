@@ -41,6 +41,23 @@ class CourseControllerUnitTest {
     }
 
     @Test
+    fun testAddCourse_validation() {
+        val courseDTO = CourseDTO(null, "", "") // validate no empty strings
+
+        every { courseServiceMock.addCourse(any()) } returns courseDTO.copy(id = 1)
+
+        val result = webTestClient.post()
+            .uri("/v1/courses")
+            .bodyValue(courseDTO)
+            .exchange()
+            .expectStatus().isBadRequest
+            .expectBody(String::class.java)
+            .returnResult().responseBody
+
+        assertEquals("CourseDTO.category cannot be blank.,CourseDTO.name cannot be blank.", result)
+    }
+
+    @Test
     fun testGetAllCourses() {
 
         every { courseServiceMock.retrieveAllCourses() } returns listOf(
