@@ -1,4 +1,4 @@
-package org.kotlinspring.catalogservice.controller
+package org.kotlinspring.coursecatalogservice.controller
 
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
