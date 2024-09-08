@@ -58,6 +58,24 @@ class CourseControllerUnitTest {
     }
 
     @Test
+    fun testAddCourse_runtime_exception() {
+        val courseDTO = CourseDTO(null, "Build a restul api with Kotlin", "Learning")
+
+        val errorMessage = "Unexpected error ocurred"
+        every { courseServiceMock.addCourse(any()) } throws RuntimeException(errorMessage)
+
+        val result = webTestClient.post()
+            .uri("/v1/courses")
+            .bodyValue(courseDTO)
+            .exchange()
+            .expectStatus().is5xxServerError
+            .expectBody(String::class.java)
+            .returnResult().responseBody
+
+        assertEquals(errorMessage, result)
+    }
+
+    @Test
     fun testGetAllCourses() {
 
         every { courseServiceMock.retrieveAllCourses() } returns listOf(
