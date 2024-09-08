@@ -25,8 +25,12 @@ class CourseService(
         return courseDTO.copy(id = courseEntity.id)
     }
 
-    fun retrieveAllCourses(): List<CourseDTO> {
-        return courseRepository.findAll().map { CourseDTO(it.id, it.name, it.category) }
+    fun retrieveAllCourses(courseName: String?): List<CourseDTO> {
+        val requestedCourses = courseName?.let {
+            courseRepository.findCoursesByNameContaining(it)
+        } ?: courseRepository.findAll()
+
+        return requestedCourses.map { CourseDTO(it.id, it.name, it.category) }
     }
 
     fun updateCourse(courseId: Int, courseDTO: CourseDTO): CourseDTO {

@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.web.util.UriComponentsBuilder
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -56,6 +57,23 @@ class CourseControllerIntgTest {
 
         println("Course DTOs are $courseDTOS")
         assertEquals(3, courseDTOS?.size)
+    }
+
+    @Test
+    internal fun getAllCourses_byName() {
+        val uriString = UriComponentsBuilder.fromUriString("/v1/courses")
+            .queryParam("courseName", "SpringBoot")
+            .toUriString()
+
+
+        val courseDTOS = webTestClient.get().uri(uriString).exchange()
+            .expectStatus().isOk
+            .expectBodyList(CourseDTO::class.java)
+            .returnResult()
+            .responseBody
+
+        println("Course DTOs are $courseDTOS")
+        assertEquals(2, courseDTOS?.size)
     }
 
     @Test
