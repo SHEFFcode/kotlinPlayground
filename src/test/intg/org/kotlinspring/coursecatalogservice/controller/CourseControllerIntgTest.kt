@@ -1,10 +1,14 @@
 package org.kotlinspring.coursecatalogservice.controller
 
+import com.kotlinspring.util.courseEntityList
+import com.kotlinspring.util.instructorEntity
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.kotlinspring.coursecatalogservice.controller.util.courseEntityList
 import org.kotlinspring.coursecatalogservice.dto.CourseDTO
+import org.kotlinspring.coursecatalogservice.entity.Course
 import org.kotlinspring.coursecatalogservice.repository.CourseRepository
+import org.kotlinspring.coursecatalogservice.repository.InstructorRepository
+import org.kotlinspring.coursecatalogservice.service.CourseService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
@@ -24,17 +28,32 @@ class CourseControllerIntgTest {
     @Autowired
     private lateinit var courseRepository: CourseRepository
 
+    @Autowired
+    private lateinit var instructorRepository: InstructorRepository
+
     @BeforeEach
     fun setup() {
-        courseRepository.deleteAll() // DB cleanup
-        val courses = courseEntityList()
-        courseRepository.saveAll(courses) // Save expected data
-
+        // DB cleanup
+        courseRepository.deleteAll()
+        instructorRepository.deleteAll()
+        // Create stub data
+        val instructor = instructorEntity()
+        val courses = courseEntityList(instructor = instructor)
+        // Persist stub data into in memory DB
+        instructorRepository.save(instructor)
+        courseRepository.saveAll(courses)
     }
 
     @Test
     internal fun addCourse() {
-        val courseDto = CourseDTO(id = null, name = "Build restful api with boot and kotlin", category = "Kotlin")
+        val instructor = instructorRepository.findAll().first() // There will only be one anyway
+        val courseDto = CourseDTO(
+            id = null,
+            name = "Build restful api with boot and kotlin",
+            category = "Kotlin",
+            instructorId=instructor.id
+        )
+
         val savedCourseDTO = webTestClient.post()
             .uri("/v1/courses")
             .bodyValue(courseDto)
@@ -78,8 +97,12 @@ class CourseControllerIntgTest {
 
     @Test
     internal fun updateCourse() {
-        val updatedCourse = webTestClient.put().uri("/v1/courses/1")
-            .bodyValue(CourseDTO(null, name = "Updated!", category = "Kotlin"))
+        val instructor = instructorRepository.findAll().first() // There will only be one anyway
+        val course = Course(null, "Build restful apis with kotlin", "Development", instructor)
+        courseRepository.save(course)
+
+        val updatedCourse = webTestClient.put().uri("/v1/courses/{courseId}", course.id)
+            .bodyValue(CourseDTO(null, name = "Updated!", category = "Kotlin", instructorId=instructor.id))
             .exchange()
             .expectStatus().isAccepted
             .expectBody(CourseDTO::class.java)
@@ -91,7 +114,11 @@ class CourseControllerIntgTest {
 
     @Test
     internal fun deleteCourse() {
-        webTestClient.delete().uri("/v1/courses/1")
+        val instructor = instructorRepository.findAll().first() // There will only be one anyway
+        val course = Course(null, "Build apis with Kotlin", "Development", instructor)
+        courseRepository.save(course)
+
+        webTestClient.delete().uri("/v1/courses/{courseId}", course.id)
             .exchange()
             .expectStatus()
             .isNoContent

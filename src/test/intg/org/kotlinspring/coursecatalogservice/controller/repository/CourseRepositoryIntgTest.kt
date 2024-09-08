@@ -1,12 +1,12 @@
 package org.kotlinspring.coursecatalogservice.controller.repository
 
+import com.kotlinspring.util.courseEntityList
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import org.kotlinspring.coursecatalogservice.controller.util.courseEntityList
 import org.kotlinspring.coursecatalogservice.repository.CourseRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest

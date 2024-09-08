@@ -10,4 +10,12 @@ data class Course(
     val id: Int?,
     var name: String,
     var category: String,
-)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "instructor_id", nullable = false)
+    val instructor: Instructor? = null,
+) {
+    override fun toString(): String {
+        // override toString so that we don't get stackoverflow exception when printing the object
+        return "Course(id=$id, name='$name', category='$category', instructor=$instructor.id)"
+    }
+}

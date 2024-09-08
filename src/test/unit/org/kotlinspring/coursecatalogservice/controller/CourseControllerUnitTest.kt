@@ -25,7 +25,7 @@ class CourseControllerUnitTest {
 
     @Test
     fun testAddCourse() {
-        val courseDTO = CourseDTO(null, "Build a restul api with Kotlin", "Learning")
+        val courseDTO = CourseDTO(null, "Build a restul api with Kotlin", "Learning", 1)
 
         every { courseServiceMock.addCourse(any()) } returns courseDTO.copy(id = 1)
 
@@ -42,7 +42,7 @@ class CourseControllerUnitTest {
 
     @Test
     fun testAddCourse_validation() {
-        val courseDTO = CourseDTO(null, "", "") // validate no empty strings
+        val courseDTO = CourseDTO(null, "", "", 1) // validate no empty strings
 
         every { courseServiceMock.addCourse(any()) } returns courseDTO.copy(id = 1)
 
@@ -59,7 +59,7 @@ class CourseControllerUnitTest {
 
     @Test
     fun testAddCourse_runtime_exception() {
-        val courseDTO = CourseDTO(null, "Build a restul api with Kotlin", "Learning")
+        val courseDTO = CourseDTO(null, "Build a restul api with Kotlin", "Learning", 1)
 
         val errorMessage = "Unexpected error ocurred"
         every { courseServiceMock.addCourse(any()) } throws RuntimeException(errorMessage)
